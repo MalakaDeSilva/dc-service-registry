@@ -9,6 +9,7 @@ import {
   getAcceptors,
   getLearners,
   getServices,
+  updateService,
 } from "./api/registry.service";
 import { Service, ServiceType } from "./model/service";
 import { setUpDummyServices } from "./Utils";
@@ -78,6 +79,16 @@ app.delete("/unergister-service", (req, res) => {
 
   unregisterService(name, () => {
     res.status(200).json({ response: "Service is un-registered." });
+  });
+});
+
+app.put("/mark-node-as-master", (req, res) => {
+  const { id, uri, role } = req.body;
+
+  const service = new Service(id, uri, role, "UP");
+
+  updateService(service, () => {
+    res.status(200).json({ response: "Master Updated." });
   });
 });
 

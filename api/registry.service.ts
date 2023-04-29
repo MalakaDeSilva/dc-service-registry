@@ -40,3 +40,13 @@ export function getAcceptors(callback: (service: ServiceType[]) => void) {
 export function getLearners(callback: (service: ServiceType[]) => void) {
   callback(serviceRegistry.filter((v) => v.role === "Learner"));
 }
+
+export function updateService(service: ServiceType, callback: () => void) {
+  let index = serviceRegistry.findIndex(
+    (serviceObj) => serviceObj.id == service.id
+  );
+
+  if (index != -1) {
+    serviceRegistry.splice(index, 1, service);
+  }
+}
