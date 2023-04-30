@@ -12,7 +12,6 @@ import {
   updateService,
 } from "./api/registry.service";
 import { Service, ServiceType } from "./model/service";
-import { setUpDummyServices } from "./Utils";
 
 const app = express();
 
