@@ -10,6 +10,7 @@ import {
   getLearners,
   getServices,
   updateService,
+  refreshRegistry,
 } from "./api/registry.service";
 import { Service, ServiceType } from "./model/service";
 
@@ -52,23 +53,23 @@ app.get("/get-service/:id", (req, res) => {
   });
 });
 
-app.get("/get-proposers/", (req, res) => {
+app.get("/get-proposers", (req, res) => {
   getProposers((proposers: ServiceType[]) => {
-    if (proposers.length == 0) res.status(200).json({ response: proposers });
+    if (proposers.length > 0) res.status(200).json({ response: proposers });
     else res.status(200).json({ response: "Service is not found." });
   });
 });
 
-app.get("/get-acceptors/", (req, res) => {
+app.get("/get-acceptors", (req, res) => {
   getAcceptors((acceptors: ServiceType[]) => {
-    if (acceptors.length == 0) res.status(200).json({ response: acceptors });
+    if (acceptors.length > 0) res.status(200).json({ response: acceptors });
     else res.status(200).json({ response: "Service is not found." });
   });
 });
 
-app.get("/get-learners/", (req, res) => {
+app.get("/get-learners", (req, res) => {
   getLearners((learners: ServiceType[]) => {
-    if (learners.length == 0) res.status(200).json({ response: learners });
+    if (learners.length > 0) res.status(200).json({ response: learners });
     else res.status(200).json({ response: "Service is not found." });
   });
 });
@@ -81,13 +82,13 @@ app.delete("/unergister-service", (req, res) => {
   });
 });
 
-app.put("/mark-node-as-master", (req, res) => {
+app.put(["/mark-node-as-master", "/update-service"], (req, res) => {
   const { id, uri, role } = req.body;
 
   const service = new Service(id, uri, role, "UP");
 
   updateService(service, () => {
-    res.status(200).json({ response: "Master Updated." });
+    res.status(200).json({ response: "Service Updated." });
   });
 });
 
@@ -102,4 +103,6 @@ app.use((req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`API listening on: ${PORT} `);
+
+  setInterval(refreshRegistry, 2000);
 });

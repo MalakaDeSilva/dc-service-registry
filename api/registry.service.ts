@@ -1,6 +1,7 @@
+import axios from "axios";
 import { ServiceType } from "../model/service";
-
 import { serviceRegistry } from "../registry/service.registry";
+import { ACCEPTOR, HEALTH_CHECK_ROUTE, LEARNER, PROPOSER } from "../Constants";
 
 export function registerService(service: ServiceType, callback: () => void) {
   serviceRegistry.push(service);
@@ -30,15 +31,15 @@ export function getService(
 }
 
 export function getProposers(callback: (service: ServiceType[]) => void) {
-  callback(serviceRegistry.filter((v) => v.role === "Proposer"));
+  callback(serviceRegistry.filter((v) => v.role === PROPOSER));
 }
 
 export function getAcceptors(callback: (service: ServiceType[]) => void) {
-  callback(serviceRegistry.filter((v) => v.role === "Acceptor"));
+  callback(serviceRegistry.filter((v) => v.role === ACCEPTOR));
 }
 
 export function getLearners(callback: (service: ServiceType[]) => void) {
-  callback(serviceRegistry.filter((v) => v.role === "Learner"));
+  callback(serviceRegistry.filter((v) => v.role === LEARNER));
 }
 
 export function updateService(service: ServiceType, callback: () => void) {
@@ -49,4 +50,26 @@ export function updateService(service: ServiceType, callback: () => void) {
   if (index != -1) {
     serviceRegistry.splice(index, 1, service);
   }
+
+  callback();
+}
+
+export function refreshRegistry() {
+  getServices((services) => {
+    let promises: any[] = [];
+
+    services.forEach((service) => {
+      promises.push(axios.get(service.uri + HEALTH_CHECK_ROUTE));
+    });
+
+    Promise.all(promises)
+      .then(axios.spread((...responses) => {}))
+      .catch((error) => {
+        services.forEach((service) => {
+          if (service.uri == error.config.url.replace(HEALTH_CHECK_ROUTE, "")) {
+            unregisterService(service.id, () => {});
+          }
+        });
+      });
+  });
 }
