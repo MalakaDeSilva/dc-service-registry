@@ -13,6 +13,7 @@ import {
   refreshRegistry,
 } from "./api/registry.service";
 import { Service, ServiceType } from "./model/service";
+import { AddressInfo } from "net";
 
 const app = express();
 
@@ -101,8 +102,9 @@ app.use((req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`API listening on: ${PORT} `);
+const server = app.listen(process.argv[2] || PORT, () => {
+  const { port } = server.address() as AddressInfo;
+  console.log(`API listening on: ${port}`);
 
   setInterval(refreshRegistry, 2000);
 });
