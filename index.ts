@@ -34,6 +34,8 @@ app.post("/register-service", (req, res) => {
   const service = new Service(id, uri, role, "UP");
 
   registerService(service, () => {
+    console.log(`New service is registered: ${service.id}`);
+
     res.status(200).json({ response: "Service is registered." });
   });
 });
@@ -104,7 +106,9 @@ app.use((req, res, next) => {
 
 const server = app.listen(process.argv[2] || PORT, () => {
   const { port } = server.address() as AddressInfo;
-  console.log(`API listening on: ${port}`);
+  console.log("Service Registry is starting...");
 
-  setInterval(refreshRegistry, 2000);
+  console.log(`Service Registry is listening on: http://127.0.0.1:${port}`);
+
+  //setInterval(refreshRegistry, 2000);
 });
